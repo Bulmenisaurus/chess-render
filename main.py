@@ -3,8 +3,9 @@ import os
 from PIL import Image, ImageDraw
 
 
+# parses chess notation into a sequence of moves, specifically Args[][], or str[][][]
 def parse_specialized_chess_notation(moves: str) -> list:
-    return [args.split(" ") for args in moves.strip().split("\n")]
+    return [[args.strip().split(" ") for args in line.split(";")] for line in moves.strip().split("\n")]
 
 
 def init_board() -> list:
@@ -30,6 +31,8 @@ def apply_move(b: list, move: list) -> list:
 
         board[idx_to] = board[idx_from]
         board[idx_from] = '.'
+    else:
+        raise ValueError(f"Unknown move type `{move[0]}` in {move}")
 
     return board
 
@@ -98,8 +101,9 @@ def chess_boards_from_moves(move_str: str, dir_path: str):
 
     write_board_image(board, '0', dir_path, [], [])
 
-    for (i, move) in enumerate(moves):
-        board = apply_move(board, move)
+    for (i, moves_in_turn) in enumerate(moves):
+        for move in moves_in_turn:
+            board = apply_move(board, move)
         write_board_image(board, str(i + 1), dir_path, [], [])
         print(f"{i}/{len(moves)}")
 
@@ -119,7 +123,7 @@ def gif_from_dir(input_directory: str, output_filename: str):
     # TODO: compress
     print(gif_frames)
     first_frame = gif_frames.pop(0)
-    first_frame.save(f"{output_filename}", format="GIF", append_images=gif_frames[1:], save_all=True, duration=500, loop=0)
+    first_frame.save(f"{output_filename}", format="GIF", append_images=gif_frames, save_all=True, duration=500, loop=0)
 
 
 # there are so many different packages available for this kind of stuff,
@@ -132,10 +136,10 @@ def clear_dir(directory: str):
 def main():
     #     R g2 h1 2
     moves = """
+m d1 h1
 m e2 e3
 m e3 d3
-m d3 d4
-m d4 c4"""
+m d3 d4; m d4 c4"""
     # https://en.wikipedia.org/wiki/Algebraic_notation_(chess)
     chess_boards_from_moves(moves, "./images/")
     gif_from_dir("./images/", "./output/output.gif")
