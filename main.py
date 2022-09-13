@@ -73,7 +73,7 @@ def write_board_image(board: list, file_name: str, directory: str, highlight_squ
         for y in range(8):
             piece_chess_color = ["white", "black"][(x + y) % 2]
             draw.rectangle(
-                [x * tile_size, y * tile_size, (x + 1) * tile_size, (y + 1) * tile_size],
+                (x * tile_size, y * tile_size, (x + 1) * tile_size, (y + 1) * tile_size),
                 fill=chess_render_colors[piece_chess_color]
             )
 
@@ -89,7 +89,6 @@ def write_board_image(board: list, file_name: str, directory: str, highlight_squ
 
             image.paste(piece_image, (x * tile_size, y * tile_size, (x + 1) * tile_size, (y + 1) * tile_size),
                         piece_image)
-
 
     image.save(f'{directory}image_{file_name}.png')
 
@@ -126,7 +125,7 @@ def gif_from_dir(input_directory: str, output_filename: str):
     first_frame.save(f"{output_filename}", format="GIF", append_images=gif_frames, save_all=True, duration=500, loop=0)
 
 
-# there are so many different packages available for this kind of stuff,
+# there are so many packages available for this kind of stuff,
 # os, shutil, glob, pathlib
 def clear_dir(directory: str):
     for file in glob.glob(directory + "*"):
